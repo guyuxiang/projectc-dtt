@@ -1,4 +1,4 @@
-# Project C DTT Contracts
+# ProjectC DTT Contracts
 
 [中文](#中文) | [English](#english)
 
