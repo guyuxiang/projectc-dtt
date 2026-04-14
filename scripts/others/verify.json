@@ -1,0 +1,108 @@
+[
+  {
+    "contractName": "UserPermission",
+    "deployParam": [
+      "deployer",
+      "config.issuer",
+      [
+        "address.Encash",
+        "address.DigitalTokenTradeDiamond",
+        "config.suspenseAccount",
+        "address.RorMarket",
+        "config.activeUsers"
+      ]
+    ],
+    "type": "normal",
+    "contractPath": "contracts/kyc/UserPermission.sol:UserPermission",
+    "facetNames": null
+  },
+  {
+    "contractName": "GLUSD",
+    "deployParam": [],
+    "type": "uups",
+    "contractPath": "contracts/token/DTTERC20.sol:DTTERC20",
+    "facetNames": null
+  },
+  {
+    "contractName": "GLSGD",
+    "deployParam": [],
+    "type": "uups",
+    "contractPath": "contracts/token/DTTERC20.sol:DTTERC20",
+    "facetNames": null
+  },
+  {
+    "contractName": "TransactionIDFactory",
+    "deployParam": [],
+    "type": "uups",
+    "contractPath": "contracts/utils/TransactionIDFactory.sol:TransactionIDFactory",
+    "facetNames": null
+  },
+  {
+    "contractName": "Encash",
+    "deployParam": [],
+    "type": "uups",
+    "contractPath": "contracts/token/Encash.sol:Encash",
+    "facetNames": null
+  },
+  {
+    "contractName": "RorEnhancement",
+    "deployParam": [],
+    "type": "uups",
+    "contractPath": "contracts/ror/RorEnhancement.sol:RorEnhancement",
+    "facetNames": null
+  },
+  {
+    "contractName": "RorMarket",
+    "deployParam": [],
+    "type": "uups",
+    "contractPath": "contracts/ror/RorMarket.sol:RorMarket",
+    "facetNames": null
+  },
+  {
+    "contractName": "UserPermission",
+    "deployParam": [
+      "deployer",
+      "config.issuer",
+      [
+        "address.Encash",
+        "address.DigitalTokenTradeDiamond",
+        "config.suspenseAccount",
+        "address.RorMarket",
+        "config.activeUsers"
+      ]
+    ],
+    "type": "normal",
+    "contractPath": "contracts/kyc/UserPermission.sol:UserPermission",
+    "facetNames": null
+  },
+  {
+    "contractName": "RORERC721",
+    "deployParam": [],
+    "type": "uups",
+    "contractPath": "contracts/token/RORERC721.sol:RORERC721",
+    "facetNames": null
+  },
+  {
+    "contractName": "Config",
+    "deployParam": [
+      "address.UserPermission",
+      "address.DigitalTokenTradeDiamond",
+      "address.Encash",
+      "address.RorEnhancement",
+      "address.RorMarket",
+      "address.RORERC721",
+      "address.TransactionIDFactory",
+      "deployer"
+    ],
+    "type": "normal",
+    "contractPath": "contracts/kyc/Config.sol:Config",
+    "facetNames": null
+  },
+  {
+    "contractName": "DigitalTokenTradeDiamond",
+    "deployParam": [],
+    "type": "diamond",
+    "contractPath": "contracts/dtt/DigitalTokenTradeDiamond.sol:DigitalTokenTradeDiamond",
+    "facetNames": null
+  }
+]

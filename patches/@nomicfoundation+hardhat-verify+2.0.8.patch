@@ -1,0 +1,109 @@
+diff --git a/node_modules/@nomicfoundation/hardhat-verify/internal/etherscan.js b/node_modules/@nomicfoundation/hardhat-verify/internal/etherscan.js
+index e3a4270..34bb315 100644
+--- a/node_modules/@nomicfoundation/hardhat-verify/internal/etherscan.js
++++ b/node_modules/@nomicfoundation/hardhat-verify/internal/etherscan.js
+@@ -20,10 +20,11 @@ class Etherscan {
+      * @param apiUrl - The Etherscan API URL, e.g. https://api.etherscan.io/api.
+      * @param browserUrl - The Etherscan browser URL, e.g. https://etherscan.io.
+      */
+-    constructor(apiKey, apiUrl, browserUrl) {
++    constructor(apiKey, apiUrl, browserUrl, chainId) {
+         this.apiKey = apiKey;
+         this.apiUrl = apiUrl;
+         this.browserUrl = browserUrl;
++        this.chainId = chainId;
+     }
+     static async getCurrentChainConfig(networkName, ethereumProvider, customChains) {
+         const currentChainId = parseInt(await ethereumProvider.send("eth_chainId"), 16);
+@@ -44,7 +45,7 @@ class Etherscan {
+         const resolvedApiKey = resolveApiKey(apiKey, chainConfig.network);
+         const apiUrl = chainConfig.urls.apiURL;
+         const browserUrl = chainConfig.urls.browserURL.trim().replace(/\/$/, "");
+-        return new Etherscan(resolvedApiKey, apiUrl, browserUrl);
++        return new Etherscan(resolvedApiKey, apiUrl, browserUrl, chainConfig.chainId);
+     }
+     /**
+      * Check if a smart contract is verified on Etherscan.
+@@ -61,6 +62,9 @@ class Etherscan {
+             action: "getsourcecode",
+             address,
+         });
++        if (this.apiUrl.includes("/v2/")) {
++            parameters.set("chainid", `${this.chainId}`);
++        }
+         const url = new URL(this.apiUrl);
+         url.search = parameters.toString();
+         let response;
+@@ -108,6 +112,9 @@ class Etherscan {
+             compilerversion: compilerVersion,
+             constructorArguements: constructorArguments,
+         });
++        if (this.apiUrl.includes("/v2/")) {
++            parameters.set("chainid", `${this.chainId}`);
++        }
+         const url = new URL(this.apiUrl);
+         let response;
+         let json;
+@@ -152,6 +159,9 @@ class Etherscan {
+             action: "checkverifystatus",
+             guid,
+         });
++        if (this.apiUrl.includes("/v2/")) {
++            parameters.set("chainid", `${this.chainId}`);
++        }
+         const url = new URL(this.apiUrl);
+         url.search = parameters.toString();
+         let response;
+diff --git a/node_modules/@nomicfoundation/hardhat-verify/src/internal/etherscan.ts b/node_modules/@nomicfoundation/hardhat-verify/src/internal/etherscan.ts
+index 45cf7b1..784f1fb 100644
+--- a/node_modules/@nomicfoundation/hardhat-verify/src/internal/etherscan.ts
++++ b/node_modules/@nomicfoundation/hardhat-verify/src/internal/etherscan.ts
+@@ -42,7 +42,8 @@ export class Etherscan {
+   constructor(
+     public apiKey: string,
+     public apiUrl: string,
+-    public browserUrl: string
++    public browserUrl: string,
++    public chainId: number
+   ) {}
+ 
+   public static async getCurrentChainConfig(
+@@ -80,7 +81,7 @@ export class Etherscan {
+     const apiUrl = chainConfig.urls.apiURL;
+     const browserUrl = chainConfig.urls.browserURL.trim().replace(/\/$/, "");
+ 
+-    return new Etherscan(resolvedApiKey, apiUrl, browserUrl);
++    return new Etherscan(resolvedApiKey, apiUrl, browserUrl, chainConfig.chainId);
+   }
+ 
+   /**
+@@ -98,6 +99,9 @@ export class Etherscan {
+       action: "getsourcecode",
+       address,
+     });
++    if (this.apiUrl.includes("/v2/")) {
++      parameters.set("chainid", `${this.chainId}`);
++    }
+ 
+     const url = new URL(this.apiUrl);
+     url.search = parameters.toString();
+@@ -160,6 +164,9 @@ export class Etherscan {
+       compilerversion: compilerVersion,
+       constructorArguements: constructorArguments,
+     });
++    if (this.apiUrl.includes("/v2/")) {
++      parameters.set("chainid", `${this.chainId}`);
++    }
+ 
+     const url = new URL(this.apiUrl);
+     let response: Dispatcher.ResponseData | undefined;
+@@ -218,6 +225,9 @@ export class Etherscan {
+       action: "checkverifystatus",
+       guid,
+     });
++    if (this.apiUrl.includes("/v2/")) {
++      parameters.set("chainid", `${this.chainId}`);
++    }
+     const url = new URL(this.apiUrl);
+     url.search = parameters.toString();
+ 

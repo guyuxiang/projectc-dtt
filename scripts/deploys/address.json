@@ -1,0 +1,143 @@
+{
+	"Config": {
+		"contractCode": "Dtt_Config",
+		"contractName": "",
+		"sourceContractName": "Config",
+		"address": "0x88aEE81a295757E39Ee4cdd386234c7D8a503354",
+		"contractDeployTxBlockNumber": 81545731,
+		"contractType": "normal",
+		"facetContracts": null
+	},
+	"DigitalTokenTradeDiamond": {
+		"contractCode": "Dtt_DigitalTokenTradeDiamond",
+		"contractName": "",
+		"sourceContractName": "DigitalTokenTradeDiamond",
+		"address": "0x2Dc8E4DC61dDD165280CF1044CE34158e156B2c4",
+		"contractDeployTxBlockNumber": 81545647,
+		"contractType": "diamond",
+		"facetContracts": [
+			{
+				"facetName": "ConditionActionFacet",
+				"address": "0x70f2668E84ecEDb9c39D086d0d55A9210a8889EE",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "ConditionCalculateFacet",
+				"address": "0xf74dbD6CE13EcA5f95f2f46C7AcD2c5C5325d411",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "ConditionCreateFacet",
+				"address": "0xd276961b04AC1E1378a87d044731AE9fB8319488",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "SendFacet",
+				"address": "0xC22C2E4F2f09c5f85D43A22cCF2750b4cBc9a182",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "SettleFacet",
+				"address": "0xC0d8E8c4fEb31a8101d3F2c31A4Dc16945DaA2C5",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "TradeStatusFacet",
+				"address": "0x789867AD1DfA179165eC058E744e0793788B5263",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "VerifyFacet",
+				"address": "0xa10373cBCC144d232E53C7d692F628745A749617",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "DiamondEtherscanFacet",
+				"address": "0xac36Ff96dd1d6732ce45941f79C8a3931F42775A",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "DiamondLoupeFacet",
+				"address": "0xA4EB3b71a7d6C60800b88cd0b20BEC981d3b16Ed",
+				"facetStatus": "Upgradeable"
+			},
+			{
+				"facetName": "DiamondCutFacet",
+				"address": "0xA199AB9e95D063f250eb916a0046A1Ce8ffAc971",
+				"facetStatus": "Upgradeable"
+			}
+		]
+	},
+	"Encash": {
+		"contractCode": "Dtt_Encash",
+		"contractName": "",
+		"sourceContractName": "Encash",
+		"address": "0x798dcb02eDa5915908BB86ECf959e2Db2204ffb0",
+		"contractDeployTxBlockNumber": 81545697,
+		"contractType": "uups",
+		"facetContracts": null
+	},
+	"GLSGD": {
+		"contractCode": "Dtt_GLSGD_ERC20Permit",
+		"contractName": "",
+		"sourceContractName": "DTTERC20",
+		"address": "0xeD7e053A8aC42dC84cfb65702dF81d148c4B091E",
+		"contractDeployTxBlockNumber": 81545619,
+		"contractType": "uups",
+		"facetContracts": null
+	},
+	"GLUSD": {
+		"contractCode": "Dtt_GLUSD_ERC20Permit",
+		"contractName": "",
+		"sourceContractName": "DTTERC20",
+		"address": "0x02d0A2eB2C2114286B8AD5eE4f3ABDbB0EF80D54",
+		"contractDeployTxBlockNumber": 81545630,
+		"contractType": "uups",
+		"facetContracts": null
+	},
+	"RORERC721": {
+		"contractCode": "Dtt_Ror_ERC721Permit",
+		"contractName": "",
+		"sourceContractName": "RORERC721",
+		"address": "0xAb271D027A1244c0B5b317ca6CBCdaB44801aA39",
+		"contractDeployTxBlockNumber": 81545707,
+		"contractType": "uups",
+		"facetContracts": null
+	},
+	"RorEnhancement": {
+		"contractCode": "Dtt_RorEnhancement",
+		"contractName": "",
+		"sourceContractName": "RorEnhancement",
+		"address": "0x6b66A7Ee20B4507dD4a11b6CB99e5C7c9C5F83A8",
+		"contractDeployTxBlockNumber": 81545716,
+		"contractType": "uups",
+		"facetContracts": null
+	},
+	"RorMarket": {
+		"contractCode": "Dtt_RorMarket",
+		"contractName": "",
+		"sourceContractName": "RorMarket",
+		"address": "0x778eA99adc19F8c5e5273F36C90526Dc00694dcd",
+		"contractDeployTxBlockNumber": 81545725,
+		"contractType": "uups",
+		"facetContracts": null
+	},
+	"TransactionIDFactory": {
+		"contractCode": "Dtt_TransactionIDFactory",
+		"contractName": "",
+		"sourceContractName": "TransactionIDFactory",
+		"address": "0xE8bCB7661Dd67840bcEfd1F62a6eD1d48AF602f8",
+		"contractDeployTxBlockNumber": 81545639,
+		"contractType": "uups",
+		"facetContracts": null
+	},
+	"UserPermission": {
+		"contractCode": "Dtt_UserPermission",
+		"contractName": "",
+		"sourceContractName": "UserPermission",
+		"address": "0x03F1793734a585B5d5C35ccC9288B18CC2C23182",
+		"contractDeployTxBlockNumber": 81545728,
+		"contractType": "normal",
+		"facetContracts": null
+	}
+}

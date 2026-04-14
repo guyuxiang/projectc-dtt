@@ -1,0 +1,107 @@
+[
+  {
+    "factoryName": "DTTERC20",
+    "contractName": "GLSGD",
+    "deployParam": [
+      "Pulse SGD Token",
+      "PLTSGD"
+    ],
+    "type": "uups"
+  },
+  {
+    "factoryName": "DTTERC20",
+    "contractName": "GLUSD",
+    "deployParam": [
+      "Pulse USD Token",
+      "PLTUSD"
+    ],
+    "type": "uups"
+  },
+  {
+    "factoryName": "TransactionIDFactory",
+    "contractName": "TransactionIDFactory",
+    "deployParam": [],
+    "type": "uups"
+  },
+  {
+    "factoryName": "DigitalTokenTradeDiamond",
+    "contractName": "DigitalTokenTradeDiamond",
+    "facetNames": [
+      "ConditionActionFacet",
+      "ConditionCalculateFacet",
+      "ConditionCreateFacet",
+      "SendFacet",
+      "SettleFacet",
+      "TradeStatusFacet",
+      "VerifyFacet"
+    ],
+    "type": "diamond"
+  },
+  {
+    "factoryName": "Encash",
+    "contractName": "Encash",
+    "deployParam": [
+      "address.TransactionIDFactory"
+    ],
+    "type": "uups"
+  },
+  {
+    "factoryName": "RORERC721",
+    "contractName": "RORERC721",
+    "deployParam": [
+      "ROR",
+      "ROR",
+      "1"
+    ],
+    "type": "uups"
+  },
+  {
+    "factoryName": "RorEnhancement",
+    "contractName": "RorEnhancement",
+    "deployParam": [
+      "address.RORERC721"
+    ],
+    "type": "uups"
+  },
+  {
+    "factoryName": "RorMarket",
+    "contractName": "RorMarket",
+    "deployParam": [
+      "address.TransactionIDFactory",
+      "address.RorEnhancement",
+      "address.RORERC721"
+    ],
+    "type": "uups"
+  },
+  {
+    "factoryName": "UserPermission",
+    "contractName": "UserPermission",
+    "deployParam": [
+      "deployer",
+      "config.issuer",
+      [
+        "address.Encash",
+        "address.DigitalTokenTradeDiamond",
+        "config.suspenseAccount",
+        "address.RorMarket",
+        "config.activeUsers"
+      ]
+    ],
+    "type": "normal"
+  },
+  {
+    "factoryName": "Config",
+    "contractName": "Config",
+    "deployParam": [
+      "address.UserPermission",
+      "address.DigitalTokenTradeDiamond",
+      "address.Encash",
+      "address.RorEnhancement",
+      "address.RorMarket",
+      "address.RORERC721",
+      "address.TransactionIDFactory",
+      "deployer"
+    ],
+    "type": "normal"
+  }
+]
