@@ -60,7 +60,7 @@ module.exports = {
       url: "https://ethereum-sepolia-rpc.publicnode.com",
       chainId: 11155111,
       accounts: [
-        "",
+        "1111111111111111111111111111111111111111111111111111111111111111",
       ],
     }
   }
