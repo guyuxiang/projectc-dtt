@@ -120,6 +120,7 @@ contract Encash is EncashPermission, Initializable, UUPSUpgradeable, OwnableUpgr
         EncashDoor(UserPermission(config.userPermission()).getPermission(IDTTERC20(tokenAddress).getIssuer(), msg.sender))
     {
         IDTTERC20 token = IDTTERC20(tokenAddress);
+        require(token.balanceOf(msg.sender) >= value, ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
         _permitIfNeeded(token, msg.sender, value, deadline, v, r, s);
         string memory businessId = IDFactory.generateTransactionID(token.symbol(), "ENCASH");
         try token.transferFrom(msg.sender, address(this), value) {
@@ -174,6 +175,7 @@ contract Encash is EncashPermission, Initializable, UUPSUpgradeable, OwnableUpgr
         );
         IDTTERC20 token = IDTTERC20(encashInfo.tokenAddress);
         require(msg.sender == token.getIssuer(), ErrorCode.SCM_RealisedTokenEncash_reject_OnlyIssuerOperate);
+        require(token.balanceOf(address(this)) >= encashInfo.value, ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
 
         try token.transfer(encashInfo.encasher, encashInfo.value) {}
         catch Error(string memory reason) {

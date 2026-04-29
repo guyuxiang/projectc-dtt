@@ -52,15 +52,15 @@ contract SettleFacet is DTTPermission, DTTStorage {
 
             RorEnhancement.SettleInfo[] memory rrs = RorEnhancement(getConfig().rorEnhancement()).settle(_businessId);
             for (uint256 i = 0; i < rrs.length; i++) {
+                require(
+                    IDTTERC20(rrs[i].dttAddress).balanceOf(address(this)) >= rrs[i].amount,
+                    ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG
+                );
                 try IDTTERC20(rrs[i].dttAddress).transfer(rrs[i].owner, rrs[i].amount) {
                     emit RorConvert(address(this), getConfig().rorAddress(), rrs[i].id, rrs[i].owner, SettleStatus.SEND);
                     // ds.businessIndex[_businessId].status
                 } catch Error(string memory reason1) {
                     // If the call is unsuccessful
-                    if (Strings.equal(reason1, "ERC20: transfer amount exceeds balance")) {
-                        revert(ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
-                    }
-
                     if (Strings.equal(reason1, ErrorCode.SCM_Permission_Token_Transfer_ERROR)) {
                         try IDTTERC20(ds.businessIndex[_businessId].tokenAddr).transfer(getConfig().getSuspense(ds.businessIndex[_businessId].tokenAddr), rrs[i].amount) {
                             emit SendSuspenseAccountReceived(
@@ -71,12 +71,8 @@ contract SettleFacet is DTTPermission, DTTStorage {
                                 getUserPermission(ds.businessIndex[_businessId].tokenAddr, ds.businessIndex[_businessId].to),
                                 "trade condition met"
                             );
-                        } catch Error(string memory reason2) {
-                            if (Strings.equal(reason2, "ERC20: transfer amount exceeds balance")) {
-                                revert(ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
-                            } else {
-                                revert(ErrorCode.SCM_DTT_settleTrade_TRANSFER_FAILED_WHEN_REALISED);
-                            }
+                        } catch Error(string memory) {
+                            revert(ErrorCode.SCM_DTT_settleTrade_TRANSFER_FAILED_WHEN_REALISED);
                         }
                     } else {
                         handleError(reason1);
@@ -92,11 +88,12 @@ contract SettleFacet is DTTPermission, DTTStorage {
             for (uint256 i = 0; i < rrs.length; i++) {
                 emit RorConvert(address(this), getConfig().rorAddress(), rrs[i].id, rrs[i].owner, SettleStatus.REFUND);
             }
+            require(
+                IDTTERC20(ds.businessIndex[_businessId].tokenAddr).balanceOf(address(this)) >= ds.businessIndex[_businessId].amount,
+                ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG
+            );
             try IDTTERC20(ds.businessIndex[_businessId].tokenAddr).transfer(ds.businessIndex[_businessId].from, ds.businessIndex[_businessId].amount) {} catch Error(string memory reason1) {
                 // If the call is unsuccessful
-                if (Strings.equal(reason1, "ERC20: transfer amount exceeds balance")) {
-                    revert(ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
-                }
                 if (Strings.equal(reason1, ErrorCode.SCM_Permission_Token_Transfer_ERROR)) {
                     try IDTTERC20(ds.businessIndex[_businessId].tokenAddr).transfer(getConfig().getSuspense(ds.businessIndex[_businessId].tokenAddr), ds.businessIndex[_businessId].amount) {
                         emit SendSuspenseAccountReceived(
@@ -107,12 +104,8 @@ contract SettleFacet is DTTPermission, DTTStorage {
                             getUserPermission(ds.businessIndex[_businessId].tokenAddr, ds.businessIndex[_businessId].from),
                             "trade voided"
                         );
-                    } catch Error(string memory reason2) {
-                        if (Strings.equal(reason2, "ERC20: transfer amount exceeds balance")) {
-                            revert(ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
-                        } else {
-                            revert(ErrorCode.SCM_DTT_settleTrade_TRANSFER_FAILED_WHEN_VOID);
-                        }
+                    } catch Error(string memory) {
+                        revert(ErrorCode.SCM_DTT_settleTrade_TRANSFER_FAILED_WHEN_VOID);
                     }
                 } else {
                     handleError(reason1);
@@ -135,25 +128,22 @@ contract SettleFacet is DTTPermission, DTTStorage {
         require(ds.businessIndex[businessId].tokenAddr == erc20Address, ErrorCode.SCM_DTT_settleTradeWithAmount_TOKEN_WRONG);
         // Instantiate ERC20 token contract
         IDTTERC20 token = IDTTERC20(erc20Address);
+        require(token.balanceOf(msg.sender) >= amount, ErrorCode.SCM_DTT_erc20TransferFrom_AMOUNT_WRONG);
         _permitIfNeeded(token, msg.sender, amount, deadline, v, r, s);
         try IDTTERC20(erc20Address).transferFrom(msg.sender, address(this), amount) {} catch Error(string memory reason) {
-            // If the call is unsuccessful
-            if (Strings.equal(reason, "ERC20: transfer amount exceeds balance")) {
-                revert(ErrorCode.SCM_DTT_erc20TransferFrom_AMOUNT_WRONG);
-            } else {
-                revert(reason);
-            }
+            revert(reason);
         }
         RorEnhancement.SettleInfo[] memory rrs = RorEnhancement(getConfig().rorEnhancement()).settle(businessId);
 
         for (uint256 i = 0; i < rrs.length; i++) {
+            require(
+                IDTTERC20(rrs[i].dttAddress).balanceOf(address(this)) >= rrs[i].amount,
+                ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG
+            );
             try IDTTERC20(rrs[i].dttAddress).transfer(rrs[i].owner, rrs[i].amount) {
                 emit RorConvert(address(this), getConfig().rorAddress(), rrs[i].id, rrs[i].owner, ds.businessIndex[businessId].status);
             } catch Error(string memory reason1) {
                 // If the call is unsuccessful
-                if (Strings.equal(reason1, "ERC20: transfer amount exceeds balance")) {
-                    revert(ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
-                }
                 if (Strings.equal(reason1, ErrorCode.SCM_Permission_Token_Transfer_ERROR)) {
                     try IDTTERC20(ds.businessIndex[businessId].tokenAddr).transfer(getConfig().getSuspense(ds.businessIndex[businessId].tokenAddr), rrs[i].amount) {
                         emit SendSuspenseAccountReceived(
@@ -164,12 +154,8 @@ contract SettleFacet is DTTPermission, DTTStorage {
                             getUserPermission(ds.businessIndex[businessId].tokenAddr, ds.businessIndex[businessId].to),
                             "trade condition met"
                         );
-                    } catch Error(string memory reason2) {
-                        if (Strings.equal(reason2, "ERC20: transfer amount exceeds balance")) {
-                            revert(ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
-                        } else {
-                            revert(ErrorCode.SCM_DTT_settleTrade_TRANSFER_FAILED_WHEN_REALISED);
-                        }
+                    } catch Error(string memory) {
+                        revert(ErrorCode.SCM_DTT_settleTrade_TRANSFER_FAILED_WHEN_REALISED);
                     }
                 } else {
                     handleError(reason1);

@@ -251,17 +251,17 @@ contract RorMarket is OwnableUpgradeable, UUPSUpgradeable {
             ErrorCode.SCM_RorMarket_transfereeAcceptWithFN_CreateTime_Error
         );
         IDTTERC20 erc20Token = IDTTERC20(rorTransfer.considerationDttAddr);
+        require(
+            erc20Token.balanceOf(rorTransfer.transferee) >= rorTransfer.considerationDttAmount,
+            ErrorCode.SCM_RorMarket_transfereeAcceptWithFN_Amount_Error
+        );
         // dtt到ror转让方
         _permitIfNeeded(erc20Token, msg.sender, rorTransfer.considerationDttAmount, deadline, v, r, s);
         try erc20Token.transferFrom(rorTransfer.transferee, rorTransfer.transferer, rorTransfer.considerationDttAmount)
         returns (bool success) {
             require(success, ErrorCode.SCM_RorMarket_transfereeAcceptWithFN_Transfer_Error);
         } catch Error(string memory reason) {
-            if (Strings.equal(reason, "ERC20: transfer amount exceeds balance")) {
-                revert(ErrorCode.SCM_RorMarket_transfereeAcceptWithFN_Amount_Error);
-            } else {
-                revert(reason);
-            }
+            revert(reason);
         }
 
         IRORERC721 ror = IRORERC721(rorAddress);

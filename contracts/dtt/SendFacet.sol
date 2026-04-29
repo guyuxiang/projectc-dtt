@@ -107,6 +107,7 @@ contract SendFacet is DTTPermission, DTTStorage {
 
         // Fund transfer
         if (guaranteeAmount != 0) {
+            require(token.balanceOf(msg.sender) >= guaranteeAmount, ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
             _permitIfNeeded(token, msg.sender, guaranteeAmount, deadline, v, r, s);
             try token.transferFrom(msg.sender, address(this), guaranteeAmount) returns (bool success) {
                 require(success, ErrorCode.SCM_DTT_sendRealisedToken_TRANSFER_FAILED);
