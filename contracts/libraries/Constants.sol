@@ -42,6 +42,7 @@ library ErrorCode {
     // ErrorCode of dtt.settleTradeWithAmount(), function seq: 07
     string public constant SCM_DTT_settleTradeWithAmount_STATUS_WRONG = "SCM_DTT_07_01";
     string public constant SCM_DTT_settleTradeWithAmount_AMOUNT_WRONG = "SCM_DTT_07_02";
+    string public constant SCM_DTT_settleTradeWithAmount_TOKEN_WRONG = "SCM_DTT_07_03";
 
     // ErrorCode of dtt.erc20Transfer(), function seq: 08
     string public constant SCM_DTT_erc20Transfer_AMOUNT_WRONG = "SCM_DTT_08_01";
@@ -53,6 +54,8 @@ library ErrorCode {
     string public constant SCM_ERC20_mint_Permit_WRONG = "SCM_ERC20_01_02";
     string public constant SCM_ERC20_mint_Limit_WRONG = "SCM_ERC20_01_03";
     string public constant SCM_ERC20_paused_WRONG = "SCM_ERC20_01_04";
+    string public constant SCM_ERC20_burn_AMOUNT_WRONG = "SCM_ERC20_01_05";
+    string public constant SCM_ERC20_burn_CALLER_WRONG = "SCM_ERC20_01_06";
 
     // ------------------------------ ErrorCode of kyc/Permission.sol ----------------------------
     // ErrorCode of TokenPermission, function seq: 01
@@ -217,4 +220,7 @@ library ErrorCode {
 
     // ErrorCode of RorMarket.accept/reject/expire(), function seq: 05
     string public constant SCM_RorMarket_transferAction_TRANS_NONINIT = "SCM_RM_05_01";
+
+    // ErrorCode of RorMarket.settleReject(), function seq: 06
+    string public constant SCM_RorMarket_settleReject_CALLER_ERROR = "SCM_RM_06_01";
 }

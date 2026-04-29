@@ -73,6 +73,12 @@ contract RorMarket is OwnableUpgradeable, UUPSUpgradeable {
 
     Config public config;
 
+    function _permitIfNeeded(IDTTERC20 token, address owner, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) private {
+        if (token.allowance(owner, address(this)) < amount) {
+            token.permit(owner, address(this), amount, deadline, v, r, s);
+        }
+    }
+
     function initialize(address _idFactoryAddr, address _rorEnhancement, address _rorAddress) public initializer {
         idFactoryAddress = _idFactoryAddr;
         rorEnhancementAddress = _rorEnhancement;
@@ -246,7 +252,7 @@ contract RorMarket is OwnableUpgradeable, UUPSUpgradeable {
         );
         IDTTERC20 erc20Token = IDTTERC20(rorTransfer.considerationDttAddr);
         // dtt到ror转让方
-        erc20Token.permit(msg.sender, address(this), rorTransfer.considerationDttAmount, deadline, v, r, s);
+        _permitIfNeeded(erc20Token, msg.sender, rorTransfer.considerationDttAmount, deadline, v, r, s);
         try erc20Token.transferFrom(rorTransfer.transferee, rorTransfer.transferer, rorTransfer.considerationDttAmount)
         returns (bool success) {
             require(success, ErrorCode.SCM_RorMarket_transfereeAcceptWithFN_Transfer_Error);
@@ -348,6 +354,7 @@ contract RorMarket is OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function settleReject(uint256 rorId) public whenNotPaused {
+        require(msg.sender == rorEnhancementAddress, ErrorCode.SCM_RorMarket_settleReject_CALLER_ERROR);
         if (Strings.equal(rorToTransferRefIdIndex[rorId], "")) {
             return;
         }

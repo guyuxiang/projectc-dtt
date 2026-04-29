@@ -57,6 +57,7 @@ contract Config is Ownable {
     }
 
     function setSuspense(address token, address suspense) public onlyGovernor returns (bool) {
+        require(suspense != address(0), "suspense is zero address");
         tokenSuspense[token] = suspense;
         emit SetSuspense(token, suspense);
         return true;

@@ -100,6 +100,12 @@ contract Encash is EncashPermission, Initializable, UUPSUpgradeable, OwnableUpgr
         string reason
     );
 
+    function _permitIfNeeded(IDTTERC20 token, address owner, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) private {
+        if (token.allowance(owner, address(this)) < amount) {
+            token.permit(owner, address(this), amount, deadline, v, r, s);
+        }
+    }
+
     function encash(
         address tokenAddress,
         uint256 value,
@@ -114,7 +120,7 @@ contract Encash is EncashPermission, Initializable, UUPSUpgradeable, OwnableUpgr
         EncashDoor(UserPermission(config.userPermission()).getPermission(IDTTERC20(tokenAddress).getIssuer(), msg.sender))
     {
         IDTTERC20 token = IDTTERC20(tokenAddress);
-        token.permit(msg.sender, address(this), value, deadline, v, r, s);
+        _permitIfNeeded(token, msg.sender, value, deadline, v, r, s);
         string memory businessId = IDFactory.generateTransactionID(token.symbol(), "ENCASH");
         try token.transferFrom(msg.sender, address(this), value) {
             encashInfos[businessId] = EncashInfo(tokenAddress, msg.sender, value, ENCASH_INIT);

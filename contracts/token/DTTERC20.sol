@@ -159,6 +159,8 @@ contract DTTERC20 is TokenPermission, ERC20PermitUpgradeable, OwnableUpgradeable
 
     function burn(uint256 amount, string memory txID) public whenNotPaused {
         require(burnRecords[txID].owner == address(0), ErrorCode.SCM_ERC20_mint_ID_REPEAT);
+        require(amount > 0, ErrorCode.SCM_ERC20_burn_AMOUNT_WRONG);
+        require(_msgSender() == config.encash(), ErrorCode.SCM_ERC20_burn_CALLER_WRONG);
         _burn(_msgSender(), amount);
         burnRecords[txID] = BurnRecord(_msgSender(), amount);
         emit Burn(txID, _msgSender(), amount);

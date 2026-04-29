@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../utils/Counters.sol";
 import "../kyc/UserPermission.sol";
@@ -155,8 +156,11 @@ contract RORERC721 is NFTPermission, ERC721Upgradeable, OwnableUpgradeable, UUPS
         require(spender != owner, "ERC721Permit: approval to current owner");
         require(!isContract(owner), "Invalid address");
 
-        address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress != address(0), "Invalid signature");
+        (address recoveredAddress, ECDSA.RecoverError error, ) = ECDSA.tryRecover(digest, v, r, s);
+        if (error == ECDSA.RecoverError.InvalidSignatureS) {
+            revert("ECDSA: invalid signature s value");
+        }
+        require(error == ECDSA.RecoverError.NoError, "Invalid signature");
         require(recoveredAddress == owner, "Unauthorized");
         Counters.increment(_nonces[tokenId]);
         _approve(spender, tokenId, address(0));

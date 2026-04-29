@@ -21,6 +21,12 @@ contract SettleFacet is DTTPermission, DTTStorage {
 
     event SettleTradeWaiting(string indexed businessIdHash, string businessId);
 
+    function _permitIfNeeded(IDTTERC20 token, address owner, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) private {
+        if (token.allowance(owner, address(this)) < amount) {
+            token.permit(owner, address(this), amount, deadline, v, r, s);
+        }
+    }
+
     function settleTrade(string memory _businessId) public whenNotPaused {
         // Check if the parameter is not empty
         require(bytes(_businessId).length > 0, ErrorCode.SCM_DTT_settleTrade_ID_ERROR);
@@ -126,9 +132,10 @@ contract SettleFacet is DTTPermission, DTTStorage {
     function settleTradeWithAmount(string memory businessId, address erc20Address, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) public whenNotPaused {
         require(ds.businessIndex[businessId].status == SettleStatus.WAIT, ErrorCode.SCM_DTT_settleTradeWithAmount_STATUS_WRONG);
         require(ds.businessIndex[businessId].amount == ds.businessIndexExpand[businessId].guaranteeAmount + amount, ErrorCode.SCM_DTT_settleTradeWithAmount_AMOUNT_WRONG);
+        require(ds.businessIndex[businessId].tokenAddr == erc20Address, ErrorCode.SCM_DTT_settleTradeWithAmount_TOKEN_WRONG);
         // Instantiate ERC20 token contract
         IDTTERC20 token = IDTTERC20(erc20Address);
-        token.permit(msg.sender, address(this), amount, deadline, v, r, s);
+        _permitIfNeeded(token, msg.sender, amount, deadline, v, r, s);
         try IDTTERC20(erc20Address).transferFrom(msg.sender, address(this), amount) {} catch Error(string memory reason) {
             // If the call is unsuccessful
             if (Strings.equal(reason, "ERC20: transfer amount exceeds balance")) {

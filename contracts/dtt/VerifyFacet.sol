@@ -146,6 +146,7 @@ contract VerifyFacet is DTTPermission, DTTStorage {
             ds.businessIndex[businessId].amount == ds.businessIndexExpand[businessId].guaranteeAmount + amount,
             ErrorCode.SCM_DTT_settleTradeWithAmount_AMOUNT_WRONG
         );
+        require(ds.businessIndex[businessId].tokenAddr == erc20Address, ErrorCode.SCM_DTT_settleTradeWithAmount_TOKEN_WRONG);
         // Instantiate ERC20 token contract
         IDTTERC20 token = IDTTERC20(erc20Address);
         // 校验合约入账权限
@@ -176,6 +177,8 @@ contract VerifyFacet is DTTPermission, DTTStorage {
             return TradeStatus.Realised;
         } else if (trade.status == SettleStatus.REFUND) {
             return TradeStatus.Void;
+        } else if (trade.status == SettleStatus.WAIT) {
+            return TradeStatus.Confirmed;
         } else if (trade.status == SettleStatus.INIT) {
             ConditionStatus timeConditionStatus = IConditionCalculateFacet(address(this)).querySCStatus(trade.timeScId);
             ConditionStatus conditionStatus = ConditionStatus.Met;

@@ -19,6 +19,8 @@ contract TradeStatusFacet is DTTPermission, DTTStorage {
             return TradeStatus.Realised;
         } else if (ds.businessIndex[businessId].status == SettleStatus.REFUND) {
             return TradeStatus.Void;
+        } else if (ds.businessIndex[businessId].status == SettleStatus.WAIT) {
+            return TradeStatus.Confirmed;
         } else if (ds.businessIndex[businessId].status == SettleStatus.INIT) {
             ConditionStatus timeConditionStatus =
                 IConditionCalculateFacet(address(this)).querySCStatus(ds.businessIndex[businessId].timeScId);

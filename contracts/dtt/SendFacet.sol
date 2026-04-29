@@ -43,6 +43,12 @@ contract SendFacet is DTTPermission, DTTStorage {
 
     event setConfigEvent(address configContract);
 
+    function _permitIfNeeded(IDTTERC20 token, address owner, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) private {
+        if (token.allowance(owner, address(this)) < amount) {
+            token.permit(owner, address(this), amount, deadline, v, r, s);
+        }
+    }
+
     function setConfig(address _config) public {
         if (address(getConfig()) == address(0)) {
             if (msg.sender != Config(_config).governorAddress()) {
@@ -101,7 +107,7 @@ contract SendFacet is DTTPermission, DTTStorage {
 
         // Fund transfer
         if (guaranteeAmount != 0) {
-            token.permit(msg.sender, address(this), guaranteeAmount, deadline, v, r, s);
+            _permitIfNeeded(token, msg.sender, guaranteeAmount, deadline, v, r, s);
             try token.transferFrom(msg.sender, address(this), guaranteeAmount) returns (bool success) {
                 require(success, ErrorCode.SCM_DTT_sendRealisedToken_TRANSFER_FAILED);
             } catch Error(string memory reason) {
