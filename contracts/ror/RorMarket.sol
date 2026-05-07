@@ -2,6 +2,8 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../kyc/Config.sol";
 import "../libraries/Constants.sol";
@@ -14,6 +16,7 @@ import "../interfaces/IRORERC721.sol";
 
 contract RorMarket is OwnableUpgradeable, UUPSUpgradeable {
     using EnumerableSet for EnumerableSet.Bytes32Set;
+    using SafeERC20 for IERC20;
 
     enum PartialType {
         FULL,
@@ -257,12 +260,12 @@ contract RorMarket is OwnableUpgradeable, UUPSUpgradeable {
         );
         // dtt到ror转让方
         _permitIfNeeded(erc20Token, msg.sender, rorTransfer.considerationDttAmount, deadline, v, r, s);
-        try erc20Token.transferFrom(rorTransfer.transferee, rorTransfer.transferer, rorTransfer.considerationDttAmount)
-        returns (bool success) {
-            require(success, ErrorCode.SCM_RorMarket_transfereeAcceptWithFN_Transfer_Error);
-        } catch Error(string memory reason) {
-            revert(reason);
-        }
+        // FT consideration transfers now use raw SafeERC20 semantics instead of remapping transfer failures.
+        IERC20(rorTransfer.considerationDttAddr).safeTransferFrom(
+            rorTransfer.transferee,
+            rorTransfer.transferer,
+            rorTransfer.considerationDttAmount
+        );
 
         IRORERC721 ror = IRORERC721(rorAddress);
         try ror.transferFrom(address(this), rorTransfer.transferee, rorTransfer.rorId) {}

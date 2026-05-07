@@ -46,4 +46,33 @@ describe('Encash Methods', function () {
     await encash.connect(issuer).reject(ev2.args.businessId, 'reject')
     expect((await encash.encashInfos(ev2.args.businessId)).state).to.equal('REJECT')
   })
+
+  it('should route reject to suspense when encasher credit door is closed', async function () {
+    const { erc20, encash, issuer, alice, suspense, userPermission } = await loadFixture(deployFixture)
+
+    const mintSig = await signMintPermit(erc20, issuer, alice.address, 500, 'MINT_ENCASH_SUSPENSE')
+    await erc20.connect(issuer).mint(alice.address, 500, 'MINT_ENCASH_SUSPENSE', mintSig)
+
+    const deadline = (await time.latest()) + 3600
+    const permit = await signPermit(erc20, alice, await encash.getAddress(), 300, deadline)
+    const encashTx = await encash.connect(alice).encash(
+      await erc20.getAddress(),
+      300,
+      deadline,
+      permit.v,
+      permit.r,
+      permit.s,
+      'encash-suspense'
+    )
+    const ev = await parseEvent(await encashTx.wait(), encash.interface, 'EncashEvent')
+
+    await userPermission.connect(issuer).setPermission(issuer.address, alice.address, 9999990, 'close credit door')
+    const rejectTx = await encash.connect(issuer).reject(ev.args.businessId, 'reject-suspense')
+    const suspenseEvent = await parseEvent(await rejectTx.wait(), encash.interface, 'EncashSuspenseAccountReceived')
+
+    expect(suspenseEvent.args.receiverAddress).to.equal(alice.address)
+    expect(await erc20.balanceOf(alice.address)).to.equal(200)
+    expect(await erc20.balanceOf(suspense.address)).to.equal(300)
+    expect((await encash.encashInfos(ev.args.businessId)).state).to.equal('REJECT')
+  })
 })

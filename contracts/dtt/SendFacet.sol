@@ -3,6 +3,8 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../libraries/Constants.sol";
 import "./DTTStorage.sol";
 import "../interfaces/ITradeStatusFacet.sol";
@@ -19,6 +21,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 contract SendFacet is DTTPermission, DTTStorage {
     using EnumerableSet for EnumerableSet.Bytes32Set;
+    using SafeERC20 for IERC20;
     event CreateTrade(
         string indexed businessIdHash,
         string businessId,
@@ -109,16 +112,8 @@ contract SendFacet is DTTPermission, DTTStorage {
         if (guaranteeAmount != 0) {
             require(token.balanceOf(msg.sender) >= guaranteeAmount, ErrorCode.SCM_DTT_erc20Transfer_AMOUNT_WRONG);
             _permitIfNeeded(token, msg.sender, guaranteeAmount, deadline, v, r, s);
-            try token.transferFrom(msg.sender, address(this), guaranteeAmount) returns (bool success) {
-                require(success, ErrorCode.SCM_DTT_sendRealisedToken_TRANSFER_FAILED);
-            } catch Error(string memory reason) {
-                // If the call is unsuccessful
-                if (Strings.equal(reason, ErrorCode.SCM_Permission_Token_Transfer_ERROR)) {
-                    revert(ErrorCode.SCM_Permission_Token_Transfer_ERROR);
-                } else {
-                    revert(reason);
-                }
-            }
+            // Creation funding is aligned with the later settlement paths and bubbles SafeERC20/token errors directly.
+            IERC20(erc20Address).safeTransferFrom(msg.sender, address(this), guaranteeAmount);
         }
 
         // Generate businessId

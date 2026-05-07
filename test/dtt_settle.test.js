@@ -112,4 +112,53 @@ describe('DTT Settle Methods', function () {
 
     expect(await erc20.balanceOf(bob.address)).to.equal(1000)
   })
+
+  it('should route settlement to suspense when recipient credit door is closed', async function () {
+    const { erc20, diamond, issuer, alice, bob, suspense, userPermission } = await loadFixture(deployFixture)
+    await mintWithPermit(erc20, issuer, alice, 5000, 'MINT_SW_SUSPENSE')
+
+    const now = await time.latest()
+    const start = now + 3600
+    const end = start + 3600
+    const dttSend = await ethers.getContractAt('SendFacet', await diamond.getAddress())
+    const scs = [
+      sc('SC0', 'T4:v2', 'At date [Date]', [
+        cf('END_DATE', String(end), false, false, ethers.ZeroAddress, 0, 0),
+        cf('START_DATE', String(start), false, false, ethers.ZeroAddress, 0, 0),
+      ], []),
+    ]
+
+    const deadline = now + 7200
+    const permit = await signPermit(erc20, alice, await diamond.getAddress(), 1000, deadline)
+    const sendTx = await dttSend.connect(alice).sendRealisedToken(
+      bob.address,
+      await erc20.getAddress(),
+      1000,
+      scs,
+      [],
+      'SC0',
+      '',
+      false,
+      ethers.ZeroAddress,
+      '',
+      deadline,
+      1000,
+      '',
+      permit.v,
+      permit.r,
+      permit.s
+    )
+
+    const businessId = (await parseEvent(await sendTx.wait(), dttSend.interface, 'CreateTrade')).args.businessId
+    await userPermission.connect(issuer).setPermission(issuer.address, bob.address, 9999990, 'close credit door')
+    await time.increase(4000)
+
+    const dttSettle = await ethers.getContractAt('SettleFacet', await diamond.getAddress())
+    const settleTx = await dttSettle.connect(alice).settleTrade(businessId)
+    const suspenseEvent = await parseEvent(await settleTx.wait(), dttSettle.interface, 'SendSuspenseAccountReceived')
+
+    expect(suspenseEvent.args.receiverAddress).to.equal(bob.address)
+    expect(await erc20.balanceOf(bob.address)).to.equal(0)
+    expect(await erc20.balanceOf(suspense.address)).to.equal(1000)
+  })
 })
